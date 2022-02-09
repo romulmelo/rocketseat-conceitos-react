@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import '../styles/tasklist.scss'
 
@@ -13,9 +13,24 @@ interface Task {
 export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const inputEl = useRef<HTMLInputElement>(null)
 
   function handleCreateNewTask() {
-    // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+    const isEmptyTitle = newTaskTitle
+    const randomTaskId = Math.floor(Math.random() * 100000)
+
+    if (!isEmptyTitle) {
+      inputEl.current?.focus()
+      return
+    }
+
+    const newTask: Task = {
+      id: randomTaskId,
+      title: newTaskTitle,
+      isComplete: false
+    }
+
+    return setTasks(tasks => [...tasks, newTask])
   }
 
   function handleToggleTaskCompletion(id: number) {
@@ -33,8 +48,9 @@ export function TaskList() {
 
         <div className="input-group">
           <input 
-            type="text" 
-            placeholder="Adicionar novo todo" 
+            type="text"
+            placeholder="Adicionar novo todo"
+            ref={inputEl}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             value={newTaskTitle}
           />
